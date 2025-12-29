@@ -17,6 +17,9 @@ namespace Wobble.Graphics.Sprites
 
         public Texture2D PerformBlend(Texture2D srcTexture, Texture2D srcMask)
         {
+            if (RenderTarget != null)
+                RenderTarget.Dispose();
+
             RenderTarget = new RenderTarget2D(GameBase.Game.GraphicsDevice, srcTexture.Width, srcTexture.Height, false,
                 GameBase.Game.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None);
 
