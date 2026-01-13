@@ -30,7 +30,7 @@ namespace Wobble.Graphics.Sprites
         /// <summary>
         ///     The scroll bar
         /// </summary>
-        public Sprite Scrollbar { get; }
+        public Sprite Scrollbar { get; protected set; }
 
         /// <summary>
         ///     If the container allows scrolling by dragging the scrollbar
