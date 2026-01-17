@@ -39,7 +39,25 @@ namespace Wobble.Graphics.Sprites.Text
         {
             DefaultSize = size;
 
-            _fontSystem = new FontSystem();
+            var settings = new FontSystemSettings
+            {
+                // Renders font at higher resolution (e.g., 2f = 2x quality), then scales down for sharper text
+                // Default: 1f
+                FontResolutionFactor = 1f,
+
+                // Width and height of anti-aliasing blur kernel (0 = none, higher = more blur on edges)
+                // Default: 0
+                KernelWidth = 0,
+                KernelHeight = 0,
+
+                // Controls how semi-transparent pixels are stored in the font texture atlas.
+                // true (default) = premultiplied alpha, requires BlendState.AlphaBlend
+                // false = straight alpha, requires BlendState.NonPremultiplied
+                // Wobble uses BlendState.NonPremultiplied by default, so false removes dark halos.
+                PremultiplyAlpha = false
+            };
+
+            _fontSystem = new FontSystem(settings);
             _fontSystem.AddFont(font);
             Store = _fontSystem.GetFont(size);
 
