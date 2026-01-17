@@ -142,7 +142,7 @@ namespace Wobble.Graphics
                 Vector2.Multiply(ref intermediate, ref size, out var intermediate2);
                 Vector2.Add(ref position, ref intermediate2, out var scaledPos);
                 Vector2.Multiply(ref size, ref _scale, out var scaledSize);
-                
+
                 // Update _scaledAlignedRelativeRectangle
                 // So that the rectangle is scaled with its position adjusted according to the pivot and scale
                 _scaledAlignedRelativeRectangle = new RectangleF(scaledPos.X, scaledPos.Y,
@@ -635,7 +635,7 @@ namespace Wobble.Graphics
             // Update AbsoluteRotation
             AbsoluteRotation = (Parent?.AbsoluteRotation ?? 0) + Rotation;
             AbsoluteScale = (Parent?.AbsoluteScale ?? Vector2.One) * Scale;
-        
+
             RecalculateDrawMask();
 
             // Make it relative to the parent.
@@ -762,30 +762,29 @@ namespace Wobble.Graphics
                             Height = (int)animation.PerformInterpolation(gameTime);
                             break;
                         case AnimationProperty.Alpha:
-                            var type = GetType();
-
-                            if (this is Sprite)
+                            if (this is Sprite sprite)
                             {
-                                var sprite = (Sprite)this;
                                 sprite.Alpha = animation.PerformInterpolation(gameTime);
+                            }
+                            else if (this is NineSliceSprite nineSlice)
+                            {
+                                nineSlice.Alpha = animation.PerformInterpolation(gameTime);
                             }
 
                             break;
                         case AnimationProperty.Rotation:
-                            if (this is Sprite)
+                            if (this is Sprite spriteRotation)
                             {
-                                var sprite = (Sprite)this;
-                                sprite.Rotation = animation.PerformInterpolation(gameTime);
+                                spriteRotation.Rotation = animation.PerformInterpolation(gameTime);
                             }
                             else
                                 throw new NotImplementedException();
 
                             break;
                         case AnimationProperty.Color:
-                            if (this is Sprite)
+                            if (this is Sprite spriteColor)
                             {
-                                var sprite = (Sprite)this;
-                                sprite.Tint = animation.PerformColorInterpolation(gameTime);
+                                spriteColor.Tint = animation.PerformColorInterpolation(gameTime);
                             }
 
                             break;
@@ -822,30 +821,29 @@ namespace Wobble.Graphics
                                         a.Start = Height;
                                         break;
                                     case AnimationProperty.Alpha:
-                                        var type = GetType();
-
-                                        if (this is Sprite)
+                                        if (this is Sprite alphaSprite)
                                         {
-                                            var sprite = (Sprite)this;
-                                            a.Start = sprite.Alpha;
+                                            a.Start = alphaSprite.Alpha;
+                                        }
+                                        else if (this is NineSliceSprite alphaNineSlice)
+                                        {
+                                            a.Start = alphaNineSlice.Alpha;
                                         }
 
                                         break;
                                     case AnimationProperty.Rotation:
-                                        if (this is Sprite)
+                                        if (this is Sprite rotationSprite)
                                         {
-                                            var sprite = (Sprite)this;
-                                            a.Start = sprite.Rotation;
+                                            a.Start = rotationSprite.Rotation;
                                         }
                                         else
                                             throw new NotImplementedException();
 
                                         break;
                                     case AnimationProperty.Color:
-                                        if (this is Sprite)
+                                        if (this is Sprite colorSprite)
                                         {
-                                            var sprite = (Sprite)this;
-                                            a.StartColor = sprite.Tint;
+                                            a.StartColor = colorSprite.Tint;
                                         }
 
                                         break;
