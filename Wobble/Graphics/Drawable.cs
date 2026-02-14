@@ -580,7 +580,9 @@ namespace Wobble.Graphics
         {
             Dispose();
             DestroyIfParentIsNull = true;
-            Parent = null;
+
+            if (!_isFinalizing)
+                Parent = null;
         }
 
         /// <summary>
@@ -901,6 +903,12 @@ namespace Wobble.Graphics
         }
 
         /// <summary>
+        ///     Schedules a new update to be run in the next frame.
+        /// </summary>
+        /// <param name="action"></param>
+        public void Schedule(Action action) => AddScheduledUpdate(action);
+
+        /// <summary>
         ///     Removes all
         /// </summary>
         public void RemoveScheduledUpdates()
@@ -1025,11 +1033,14 @@ namespace Wobble.Graphics
             return this;
         }
 
+        private bool _isFinalizing;
+
         ~Drawable()
         {
             if (IsDisposed)
                 return;
 
+            _isFinalizing = true;
             Destroy();
             IsDisposed = true;
         }
