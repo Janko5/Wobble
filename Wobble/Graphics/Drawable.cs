@@ -725,141 +725,147 @@ namespace Wobble.Graphics
         /// <summary>
         ///     Performs all of the Animations in the queue.
         /// </summary>
+        /// <summary>
+        ///     Performs all of the Animations in the queue.
+        /// </summary>
         public void PerformTransformations(GameTime gameTime)
         {
-            for (var i = 0; i < AnimationsToRemove.Count; i++)
-                Animations.Remove(AnimationsToRemove[i]);
-
-            if (AnimationsToRemove.Count != 0)
-                AnimationsToRemove.Clear();
-
-            for (var i = 0; i < Animations.Count; i++)
+            lock (Animations)
             {
-                var animation = Animations[i];
-                try
+                for (var i = 0; i < AnimationsToRemove.Count; i++)
+                    Animations.Remove(AnimationsToRemove[i]);
+
+                if (AnimationsToRemove.Count != 0)
+                    AnimationsToRemove.Clear();
+
+                for (var i = 0; i < Animations.Count; i++)
                 {
-                    var breakOutOfLoop = false;
-
-                    switch (animation.Properties)
+                    var animation = Animations[i];
+                    try
                     {
-                        case AnimationProperty.Wait:
-                            if (animation != Animations[0])
-                            {
-                                breakOutOfLoop = true;
-                                break;
-                            }
+                        var breakOutOfLoop = false;
 
-                            AnimationWaitTime = animation.PerformInterpolation(gameTime);
-                            break;
-                        case AnimationProperty.X:
-                            X = (int)animation.PerformInterpolation(gameTime);
-                            break;
-                        case AnimationProperty.Y:
-                            Y = (int)animation.PerformInterpolation(gameTime);
-                            break;
-                        case AnimationProperty.Width:
-                            Width = (int)animation.PerformInterpolation(gameTime);
-                            break;
-                        case AnimationProperty.Height:
-                            Height = (int)animation.PerformInterpolation(gameTime);
-                            break;
-                        case AnimationProperty.Alpha:
-                            if (this is Sprite sprite)
-                            {
-                                sprite.Alpha = animation.PerformInterpolation(gameTime);
-                            }
-                            else if (this is NineSliceSprite nineSlice)
-                            {
-                                nineSlice.Alpha = animation.PerformInterpolation(gameTime);
-                            }
-
-                            break;
-                        case AnimationProperty.Rotation:
-                            if (this is Sprite spriteRotation)
-                            {
-                                spriteRotation.Rotation = animation.PerformInterpolation(gameTime);
-                            }
-                            else
-                                throw new NotImplementedException();
-
-                            break;
-                        case AnimationProperty.Color:
-                            if (this is Sprite spriteColor)
-                            {
-                                spriteColor.Tint = animation.PerformColorInterpolation(gameTime);
-                            }
-
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-
-                    if (animation.Properties == AnimationProperty.Wait && !animation.Done || breakOutOfLoop)
-                        break;
-
-                    if (animation.Done)
-                    {
-                        AnimationsToRemove.Add(animation);
-
-                        if (animation.Properties == AnimationProperty.Wait)
+                        switch (animation.Properties)
                         {
-                            AnimationWaitTime = 0;
-
-                            for (var j = 0; j < Animations.Count; j++)
-                            {
-                                var a = Animations[j];
-                                switch (a.Properties)
+                            case AnimationProperty.Wait:
+                                if (animation != Animations[0])
                                 {
-                                    case AnimationProperty.X:
-                                        a.Start = X;
-                                        break;
-                                    case AnimationProperty.Y:
-                                        a.Start = Y;
-                                        break;
-                                    case AnimationProperty.Width:
-                                        a.Start = Width;
-                                        break;
-                                    case AnimationProperty.Height:
-                                        a.Start = Height;
-                                        break;
-                                    case AnimationProperty.Alpha:
-                                        if (this is Sprite alphaSprite)
-                                        {
-                                            a.Start = alphaSprite.Alpha;
-                                        }
-                                        else if (this is NineSliceSprite alphaNineSlice)
-                                        {
-                                            a.Start = alphaNineSlice.Alpha;
-                                        }
+                                    breakOutOfLoop = true;
+                                    break;
+                                }
 
-                                        break;
-                                    case AnimationProperty.Rotation:
-                                        if (this is Sprite rotationSprite)
-                                        {
-                                            a.Start = rotationSprite.Rotation;
-                                        }
-                                        else
-                                            throw new NotImplementedException();
+                                AnimationWaitTime = animation.PerformInterpolation(gameTime);
+                                break;
+                            case AnimationProperty.X:
+                                X = (int)animation.PerformInterpolation(gameTime);
+                                break;
+                            case AnimationProperty.Y:
+                                Y = (int)animation.PerformInterpolation(gameTime);
+                                break;
+                            case AnimationProperty.Width:
+                                Width = (int)animation.PerformInterpolation(gameTime);
+                                break;
+                            case AnimationProperty.Height:
+                                Height = (int)animation.PerformInterpolation(gameTime);
+                                break;
+                            case AnimationProperty.Alpha:
+                                if (this is Sprite sprite)
+                                {
+                                    sprite.Alpha = animation.PerformInterpolation(gameTime);
+                                }
+                                else if (this is NineSliceSprite nineSlice)
+                                {
+                                    nineSlice.Alpha = animation.PerformInterpolation(gameTime);
+                                }
 
-                                        break;
-                                    case AnimationProperty.Color:
-                                        if (this is Sprite colorSprite)
-                                        {
-                                            a.StartColor = colorSprite.Tint;
-                                        }
+                                break;
+                            case AnimationProperty.Rotation:
+                                if (this is Sprite spriteRotation)
+                                {
+                                    spriteRotation.Rotation = animation.PerformInterpolation(gameTime);
+                                }
+                                else
+                                    throw new NotImplementedException();
 
-                                        break;
-                                    default:
-                                        break;
+                                break;
+                            case AnimationProperty.Color:
+                                if (this is Sprite spriteColor)
+                                {
+                                    spriteColor.Tint = animation.PerformColorInterpolation(gameTime);
+                                }
+
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+
+                        if (animation.Properties == AnimationProperty.Wait && !animation.Done || breakOutOfLoop)
+                            break;
+
+                        if (animation.Done)
+                        {
+                            AnimationsToRemove.Add(animation);
+
+                            if (animation.Properties == AnimationProperty.Wait)
+                            {
+                                AnimationWaitTime = 0;
+
+                                for (var j = 0; j < Animations.Count; j++)
+                                {
+                                    var a = Animations[j];
+                                    switch (a.Properties)
+                                    {
+                                        case AnimationProperty.X:
+                                            a.Start = X;
+                                            break;
+                                        case AnimationProperty.Y:
+                                            a.Start = Y;
+                                            break;
+                                        case AnimationProperty.Width:
+                                            a.Start = Width;
+                                            break;
+                                        case AnimationProperty.Height:
+                                            a.Start = Height;
+                                            break;
+                                        case AnimationProperty.Alpha:
+                                            if (this is Sprite alphaSprite)
+                                            {
+                                                a.Start = alphaSprite.Alpha;
+                                            }
+                                            else if (this is NineSliceSprite alphaNineSlice)
+                                            {
+                                                a.Start = alphaNineSlice.Alpha;
+                                            }
+
+                                            break;
+                                        case AnimationProperty.Rotation:
+                                            if (this is Sprite rotationSprite)
+                                            {
+                                                a.Start = rotationSprite.Rotation;
+                                            }
+                                            else
+                                                throw new NotImplementedException();
+
+                                            break;
+                                        case AnimationProperty.Color:
+                                            if (this is Sprite colorSprite)
+                                            {
+                                                a.StartColor = colorSprite.Tint;
+                                            }
+
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, LogType.Runtime);
-                    break;
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, LogType.Runtime);
+                        break;
+                    }
                 }
             }
         }
