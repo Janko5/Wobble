@@ -140,12 +140,12 @@ namespace Wobble.Graphics.UI.Form
         /// <summary>
         ///    The time since the cursor has last moved.
         /// </summary>
-        private double lastCursorMove { get; set; } = 0;
+        private double LastCursorMove { get; set; } = 0;
 
         /// <summary>
         ///    The keys that are currently being held down, and for how long.
         /// </summary>
-        private Dictionary<Keys, double> keyHeldFor { get; set; } = new Dictionary<Keys, double>();
+        private Dictionary<Keys, double> KeyHeldFor { get; set; } = new Dictionary<Keys, double>();
 
         /// <summary>
         ///     Action called when pressing enter and submitting the text box.
@@ -194,14 +194,14 @@ namespace Wobble.Graphics.UI.Form
         /// <summary>
         ///		List of AudioSamples to use for textbox keyclick sound effects.
         ///	</summary>
-        private static List<AudioSample> _keyClickSamples;
+        private static List<AudioSample> s_keyClickSamples;
         public static List<AudioSample> KeyClickSamples
         {
-            get => _keyClickSamples;
+            get => s_keyClickSamples;
             set
             {
-                _keyClickSamples?.ForEach(x => x.Dispose());
-                _keyClickSamples = value;
+                s_keyClickSamples?.ForEach(x => x.Dispose());
+                s_keyClickSamples = value;
             }
         }
 
@@ -214,7 +214,7 @@ namespace Wobble.Graphics.UI.Form
         /// <summary>
         ///		Random Number Generator
         ///	</summary>
-        private Random Rng = new Random();
+        private readonly Random _rng = new Random();
 
         /// <inheritdoc />
         /// <summary>
@@ -278,10 +278,7 @@ namespace Wobble.Graphics.UI.Form
             };
 
             // If the user clicks outside of the button, then it won't be focused anymore.
-            Button.ClickedOutside += (o, e) =>
-            {
-                Focused = false;
-            };
+            Button.ClickedOutside += (o, e) => Focused = false;
 
             CalculateContainerX();
             ChangeCursorLocation();
@@ -568,21 +565,21 @@ namespace Wobble.Graphics.UI.Form
         {
             if (!Focused)
             {
-                keyHeldFor.Clear();
+                KeyHeldFor.Clear();
                 return;
             }
             var keys = KeyboardManager.CurrentState.GetPressedKeys();
             foreach (var key in keys)
             {
-                if (!keyHeldFor.ContainsKey(key))
-                    keyHeldFor.Add(key, 0);
+                if (!KeyHeldFor.ContainsKey(key))
+                    KeyHeldFor.Add(key, 0);
                 else
-                    keyHeldFor[key] += gameTime.ElapsedGameTime.TotalMilliseconds;
+                    KeyHeldFor[key] += gameTime.ElapsedGameTime.TotalMilliseconds;
             }
-            foreach (var key in keyHeldFor.Keys.ToList())
+            foreach (var key in KeyHeldFor.Keys.ToList())
             {
                 if (!keys.Contains(key))
-                    keyHeldFor.Remove(key);
+                    KeyHeldFor.Remove(key);
             }
         }
 
@@ -641,18 +638,18 @@ namespace Wobble.Graphics.UI.Form
             var ctrl = KeyboardManager.IsCtrlDown();
 
             if (KeyboardManager.IsUniqueKeyPress(Keys.Left)
-            || (keyHeldFor.ContainsKey(Keys.Left) && keyHeldFor[Keys.Left] > 750
-                && gameTime.TotalGameTime.TotalMilliseconds - lastCursorMove > 75))
+            || (KeyHeldFor.ContainsKey(Keys.Left) && KeyHeldFor[Keys.Left] > 750
+                && gameTime.TotalGameTime.TotalMilliseconds - LastCursorMove > 75))
             {
                 MoveCursor(ctrl, true, shift);
-                lastCursorMove = gameTime.TotalGameTime.TotalMilliseconds;
+                LastCursorMove = gameTime.TotalGameTime.TotalMilliseconds;
             }
             if (KeyboardManager.IsUniqueKeyPress(Keys.Right)
-            || (keyHeldFor.ContainsKey(Keys.Right) && keyHeldFor[Keys.Right] > 750
-                && gameTime.TotalGameTime.TotalMilliseconds - lastCursorMove > 75))
+            || (KeyHeldFor.ContainsKey(Keys.Right) && KeyHeldFor[Keys.Right] > 750
+                && gameTime.TotalGameTime.TotalMilliseconds - LastCursorMove > 75))
             {
                 MoveCursor(ctrl, false, shift);
-                lastCursorMove = gameTime.TotalGameTime.TotalMilliseconds;
+                LastCursorMove = gameTime.TotalGameTime.TotalMilliseconds;
             }
 
             if (!shift &&
@@ -951,7 +948,7 @@ namespace Wobble.Graphics.UI.Form
             if (!EnableKeyClickSounds || KeyClickSamples.Count == 0)
                 return;
 
-            var r = Rng.Next(KeyClickSamples.Count);
+            var r = _rng.Next(KeyClickSamples.Count);
             KeyClickSamples[r].CreateChannel().Play();
         }
     }
