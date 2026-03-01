@@ -101,7 +101,8 @@ namespace Wobble.Graphics.Sprites.Text
 
             SetSize();
 
-            Image = WobbleAssets.WhiteBox;
+            // Do not give it a placeholder WhiteBox image, 
+            // as this causes a white flash before the RenderTarget is created and assigned
             _dirty = true;
         }
 
@@ -133,7 +134,7 @@ namespace Wobble.Graphics.Sprites.Text
             var pixelWidth = Math.Ceiling(width);
             var pixelHeight = Math.Ceiling(height);
 
-            var flooredSize = new ScalableVector2((float) pixelWidth, (float) pixelHeight);
+            var flooredSize = new ScalableVector2((float)pixelWidth, (float)pixelHeight);
             Size = flooredSize / _scale;
         }
 
@@ -189,8 +190,8 @@ namespace Wobble.Graphics.Sprites.Text
             if (Rotation == 0)
             {
                 // Round the coordinates. Not rounding the coordinates means bad text.
-                var pixelX = (int) (x * WindowManager.ScreenScale.X);
-                var pixelY = (int) (y * WindowManager.ScreenScale.Y);
+                var pixelX = (int)(x * WindowManager.ScreenScale.X);
+                var pixelY = (int)(y * WindowManager.ScreenScale.Y);
 
                 x = pixelX / WindowManager.ScreenScale.X;
                 y = pixelY / WindowManager.ScreenScale.Y;
@@ -216,8 +217,8 @@ namespace Wobble.Graphics.Sprites.Text
 
             _ = GameBase.Game.TryEndBatch();
             var (width, height) = _raw.AbsoluteSize;
-            var pixelWidth = (int) Math.Ceiling(width);
-            var pixelHeight = (int) Math.Ceiling(height);
+            var pixelWidth = (int)Math.Ceiling(width);
+            var pixelHeight = (int)Math.Ceiling(height);
 
             if (pixelWidth == 0 || pixelHeight == 0)
             {
