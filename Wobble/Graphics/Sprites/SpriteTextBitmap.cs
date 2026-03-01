@@ -126,12 +126,15 @@ namespace Wobble.Graphics.Sprites
                 base.DrawToSpriteBatch();
                 return;
             }
-            else
-            {
-                GameBase.Game.SpriteBatch.DrawString(Font, DisplayedText, AbsolutePosition, _color, AbsoluteRotation,
-                    Vector2.Zero, new Vector2((float)FontSize / Font.LineHeight, (float)FontSize / Font.LineHeight) * AbsoluteScale,
-                    Effects, 0, null);
-            }
+
+            // If we are caching to a render target but it's not ready yet, 
+            // do not draw anything (prevents the WhiteBox flash).
+            if (!CachedTexture && CacheToRenderTarget)
+                return;
+
+            GameBase.Game.SpriteBatch.DrawString(Font, DisplayedText, AbsolutePosition, _color, AbsoluteRotation,
+                Vector2.Zero, new Vector2((float)FontSize / Font.LineHeight, (float)FontSize / Font.LineHeight) * AbsoluteScale,
+                Effects, 0, null);
         }
 
         /// <inheritdoc />

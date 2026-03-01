@@ -243,5 +243,17 @@ namespace Wobble.Graphics.Sprites.Text
 
             Image = RenderTarget;
         }
+
+        /// <inheritdoc />
+        /// <summary>
+        ///     Overrides the base draw to prevent rendering the fallback WhiteBox while the RenderTarget is generating.
+        /// </summary>
+        public override void DrawToSpriteBatch()
+        {
+            if (Image == null || Image == WobbleAssets.WhiteBox)
+                return;
+
+            base.DrawToSpriteBatch();
+        }
     }
 }
