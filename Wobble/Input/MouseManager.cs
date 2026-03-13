@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -35,6 +35,11 @@ namespace Wobble.Input
         public static bool IsScrollingDown(bool invert = false) => IsScrolling
                                               && (CurrentState.ScrollWheelValue < PreviousState.ScrollWheelValue)
                                               ^ invert;
+
+        /// <summary>
+        ///     Consumes the scroll for the current frame, preventing other components from seeing it.
+        /// </summary>
+        public static void ConsumeScroll() => PreviousState = CurrentState;
 
         /// <summary>
         ///     Updates the MouseManager and keeps track of the current and previous mouse states.
