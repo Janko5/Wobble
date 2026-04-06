@@ -107,7 +107,12 @@ namespace Wobble.Graphics.UI.Dialogs
         public static void DismissAll()
         {
             DialogsToBeRemoved = new List<DialogScreen>();
-            Dialogs.ForEach(x => Dialogs.Add(x));
+            Dialogs.ForEach(x => DialogsToBeRemoved.Add(x));
         }
+
+        /// <summary>
+        ///     Returns true if any dialogs are currently active.
+        /// </summary>
+        public static bool IsAnyActive => Dialogs.Count > 0 || DialogsToBeAdded.Count > 0;
     }
 }

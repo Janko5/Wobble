@@ -236,8 +236,9 @@ namespace Wobble.Graphics.Sprites
             var r = MathHelper.Lerp(Tint.R, color.R, (float)Math.Min(dt / scale, 1));
             var g = MathHelper.Lerp(Tint.G, color.G, (float)Math.Min(dt / scale, 1));
             var b = MathHelper.Lerp(Tint.B, color.B, (float)Math.Min(dt / scale, 1));
+            var a = MathHelper.Lerp(Tint.A, color.A, (float)Math.Min(dt / scale, 1));
 
-            Tint = new Color((int)r, (int)g, (int)b);
+            Tint = new Color((int)r, (int)g, (int)b, (int)a);
         }
 
         /// <summary>

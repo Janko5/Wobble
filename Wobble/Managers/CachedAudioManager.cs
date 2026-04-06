@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Wobble.Audio.Samples;
 using Wobble.Audio.Tracks;
@@ -8,11 +9,11 @@ namespace Wobble.Managers
     {
         /// <summary>
         /// </summary>
-        public static Dictionary<string, AudioTrack> Tracks { get; } = new Dictionary<string, AudioTrack>();
+        public static ConcurrentDictionary<string, AudioTrack> Tracks { get; } = new ConcurrentDictionary<string, AudioTrack>();
 
         /// <summary>
         /// </summary>
-        public static Dictionary<string, AudioSample> Samples { get; } = new Dictionary<string, AudioSample>();
+        public static ConcurrentDictionary<string, AudioSample> Samples { get; } = new ConcurrentDictionary<string, AudioSample>();
 
         /// <summary>
         ///     Loads an AudioTrack and caches it for later use
@@ -21,13 +22,16 @@ namespace Wobble.Managers
         /// <returns></returns>
         public static AudioTrack LoadTrack(string name)
         {
-            if (Tracks.ContainsKey(name))
-                return Tracks[name];
+            if (Tracks.TryGetValue(name, out var track))
+                return track;
 
-            var track = new AudioTrack(GameBase.Game.Resources.Get(name));
-            Tracks.Add(name, track);
+            var loadedTrack = new AudioTrack(GameBase.Game.Resources.Get(name));
+            var finalTrack = Tracks.GetOrAdd(name, loadedTrack);
 
-            return track;
+            if (finalTrack != loadedTrack)
+                loadedTrack.Dispose();
+
+            return finalTrack;
         }
 
         /// <summary>
@@ -37,13 +41,16 @@ namespace Wobble.Managers
         /// <returns></returns>
         public static AudioSample LoadSample(string name)
         {
-            if (Samples.ContainsKey(name))
-                return Samples[name];
+            if (Samples.TryGetValue(name, out var sample))
+                return sample;
 
-            var sample = new AudioSample(GameBase.Game.Resources.Get(name));
-            Samples.Add(name, sample);
+            var loadedSample = new AudioSample(GameBase.Game.Resources.Get(name));
+            var finalSample = Samples.GetOrAdd(name, loadedSample);
 
-            return sample;
+            if (finalSample != loadedSample)
+                loadedSample.Dispose();
+
+            return finalSample;
         }
     }
 }

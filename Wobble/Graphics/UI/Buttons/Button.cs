@@ -124,7 +124,7 @@ namespace Wobble.Graphics.UI.Buttons
 
                 // Get the button that is on the top layer.
                 var topLayerButton = ButtonManager.Buttons
-                    .Where(x => x != null && x.IsHoveredWithoutDrawOrder && x.IsClickable && IsGloballyClickable)
+                    .Where(x => x != null && !x.IsDisposed && x.Visible && x.IsHoveredWithoutDrawOrder && x.IsClickable && IsGloballyClickable)
                     .OrderBy(x => x.Depth).ThenByDescending(x => x.DrawOrder).DefaultIfEmpty(null).First();
 
                 if (topLayerButton == null)

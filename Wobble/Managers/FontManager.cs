@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using MonoGame.Extended.BitmapFonts;
 using Wobble.Graphics.Sprites.Text;
@@ -10,11 +11,11 @@ namespace Wobble.Managers
     {
         /// <summary>
         /// </summary>
-        public static Dictionary<string, BitmapFont> BitmapFonts { get; } = new Dictionary<string, BitmapFont>();
+        public static ConcurrentDictionary<string, BitmapFont> BitmapFonts { get; } = new ConcurrentDictionary<string, BitmapFont>();
 
         /// <summary>
         /// </summary>
-        public static Dictionary<string, WobbleFontStore> WobbleFonts { get; } = new Dictionary<string, WobbleFontStore>();
+        public static ConcurrentDictionary<string, WobbleFontStore> WobbleFonts { get; } = new ConcurrentDictionary<string, WobbleFontStore>();
 
         /// <summary>
         ///     Loads and caches a bitmap font
@@ -23,13 +24,11 @@ namespace Wobble.Managers
         /// <returns></returns>
         public static BitmapFont LoadBitmapFont(string name)
         {
-            if (BitmapFonts.ContainsKey(name))
-                return BitmapFonts[name];
+            if (BitmapFonts.TryGetValue(name, out var font))
+                return font;
 
-            var font = GameBase.Game.Content.Load<BitmapFont>(name);
-            BitmapFonts.Add(name, font);
-
-            return font;
+            var loadedFont = GameBase.Game.Content.Load<BitmapFont>(name);
+            return BitmapFonts.GetOrAdd(name, loadedFont);
         }
 
         /// <summary>
@@ -41,10 +40,9 @@ namespace Wobble.Managers
         /// <exception cref="ArgumentException"></exception>
         public static void CacheWobbleFont(string name, WobbleFontStore font)
         {
-            if (WobbleFonts.ContainsKey(name))
+            if (!WobbleFonts.TryAdd(name, font))
                 throw new ArgumentException("A font with this name already exists!");
 
-            WobbleFonts.Add(name, font);
             Logger.Debug($"Loaded font: {name}", LogType.Runtime);
         }
 

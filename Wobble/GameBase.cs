@@ -39,6 +39,6 @@ namespace Wobble
         /// <summary>
         ///     Dictates if the default SpriteBatch is currently in use.
         /// </summary>
-        public static bool DefaultSpriteBatchInUse { get; internal set; }
+        public static bool DefaultSpriteBatchInUse { get; set; }
     }
-}
+}
