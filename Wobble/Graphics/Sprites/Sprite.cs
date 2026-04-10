@@ -197,6 +197,9 @@ namespace Wobble.Graphics.Sprites
         /// </summary>
         public override void Destroy()
         {
+            if (SpriteBatchOptions?.Shader != null && System.Threading.Thread.CurrentThread.ManagedThreadId == GameBase.Game.MainThreadId)
+                GameBase.Game.TryEndBatch();
+
             SpriteBatchOptions?.Shader?.Dispose();
             base.Destroy();
         }

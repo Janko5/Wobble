@@ -13,6 +13,12 @@ namespace Wobble.Graphics.Shaders
         public Effect ShaderEffect { get; set; }
 
         /// <summary>
+        ///     If this shader instance owns the underlying effect and should dispose it.
+        ///     Set to false for shared effects.
+        /// </summary>
+        public bool OwnsShaderEffect { get; set; } = true;
+
+        /// <summary>
         ///     If the shader has already been disposed of.
         /// </summary>
         public bool IsDisposed { get; private set; }
@@ -52,7 +58,9 @@ namespace Wobble.Graphics.Shaders
         /// </summary>
         public void Dispose()
         {
-            ShaderEffect.Dispose();
+            if (OwnsShaderEffect)
+                ShaderEffect.Dispose();
+
             IsDisposed = true;
         }
 
