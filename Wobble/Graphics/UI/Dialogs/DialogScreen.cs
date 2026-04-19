@@ -40,7 +40,21 @@ namespace Wobble.Graphics.UI.Dialogs
             Tint = Color.Black;
 
             Container = new Container() { Parent = this };
+
+            // Pushes this dialog screen onto the input stack so that it receives focus
+            // and blocks input for anything below it.
+            ButtonManager.PushInputRoot(this);
         }
+
+        /// <inheritdoc />
+        public override void Destroy()
+        {
+            // Pops this dialog screen from the input stack.
+            ButtonManager.PopInputRoot();
+
+            base.Destroy();
+        }
+
 
         /// <inheritdoc />
         /// <summary>

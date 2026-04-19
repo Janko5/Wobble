@@ -99,6 +99,13 @@ namespace Wobble.Graphics.UI.Buttons
         /// </summary>
         public int Depth { get; set; }
 
+        /// <summary>
+        ///     If true, this button will ignore any active input roots and will always be interactive.
+        ///     Used for system-level overlays like the Volume Controller.
+        /// </summary>
+        public bool IsSystemLayer { get; set; }
+
+
         /// <inheritdoc />
         /// <summary>
         /// </summary>
@@ -122,10 +129,15 @@ namespace Wobble.Graphics.UI.Buttons
                 // Set this to be hovered without the draw order check.
                 IsHoveredWithoutDrawOrder = true;
 
+                // Get the current active input root from the manager.
+                var activeRoot = ButtonManager.GetActiveRoot();
+
                 // Get the button that is on the top layer.
                 var topLayerButton = ButtonManager.Buttons
                     .Where(x => x != null && !x.IsDisposed && x.Visible && x.IsHoveredWithoutDrawOrder && x.IsClickable && IsGloballyClickable)
+                    .Where(x => activeRoot == null || x.IsSystemLayer || x == activeRoot || x.IsDescendantOf(activeRoot))
                     .OrderBy(x => x.Depth).ThenByDescending(x => x.DrawOrder).DefaultIfEmpty(null).First();
+
 
                 if (topLayerButton == null)
                 {

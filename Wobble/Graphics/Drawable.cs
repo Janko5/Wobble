@@ -886,8 +886,31 @@ namespace Wobble.Graphics
         public bool IsHovered() => GraphicsHelper.RectangleContains(ScreenRectangle, MouseManager.CurrentState.Position);
 
         /// <summary>
+        ///     Returns true if this drawable is a descendant of the given drawable.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool IsDescendantOf(Drawable other)
+        {
+            if (other == null)
+                return false;
+
+            var current = Parent;
+            while (current != null)
+            {
+                if (current == other)
+                    return true;
+
+                current = current.Parent;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         ///     Removes all previously scheduled updates, and schedules a new one to run in the next frame
         /// </summary>
+
         /// <param name="action"></param>
         public void ScheduleUpdate(Action action)
         {
