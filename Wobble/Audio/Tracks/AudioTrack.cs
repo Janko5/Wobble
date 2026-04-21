@@ -85,7 +85,16 @@ namespace Wobble.Audio.Tracks
 
         /// <summary>
         /// </summary>
-        public double Time => Bass.ChannelBytes2Seconds(Stream, Bass.ChannelGetPosition(Stream)) * 1000;
+        public double Time
+        {
+            get
+            {
+                if (!StreamLoaded || IsDisposed)
+                    return 0;
+
+                return Bass.ChannelBytes2Seconds(Stream, Bass.ChannelGetPosition(Stream)) * 1000;
+            }
+        }
 
         /// <summary>
         ///     If the stream is currently loaded.
@@ -410,8 +419,8 @@ namespace Wobble.Audio.Tracks
         {
             if (!StreamLoaded)
             {
-                Logger.Error("Cannot call AfterLoad if stream isn't loaded.", LogType.Runtime);
-                return;
+                var error = Bass.LastError;
+                throw new AudioEngineException($"Failed to load audio stream. BASS Error: {error} ({(int)error}). Path: {OriginalFilePath ?? "N/A"}", error);
             }
 
             lock (AudioManager.Tracks)
@@ -440,7 +449,8 @@ namespace Wobble.Audio.Tracks
             if (StreamLoaded && !IsDisposed)
                 return;
 
-            Logger.Error("You cannot change a disposed/unloaded track's position.", LogType.Runtime);
+            var reason = IsDisposed ? "disposed" : "unloaded";
+            Logger.Error($"You cannot perform this action on a {reason} track. Path: {OriginalFilePath ?? "N/A"}", LogType.Runtime);
         }
 
         /// <summary>
