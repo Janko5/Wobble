@@ -286,6 +286,20 @@ namespace Wobble.Graphics.UI.Buttons
         public void RemoveClickHandlers() => Clicked = null;
 
         /// <summary>
+        ///     Removes all event handlers from this button (click, hover, right-click, etc.)
+        ///     Used for safe recycling of buttons without calling Destroy().
+        /// </summary>
+        public void ClearAllEventHandlers()
+        {
+            Clicked = null;
+            ClickedOutside = null;
+            Hovered = null;
+            LeftHover = null;
+            RightClicked = null;
+            MiddleMouseClicked = null;
+        }
+
+        /// <summary>
         ///     Checks if the mouse is in the click area of the button.
         ///
         ///     This is marked as virtual because some buttons may want to increase/decrease
