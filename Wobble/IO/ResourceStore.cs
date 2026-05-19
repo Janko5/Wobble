@@ -153,6 +153,12 @@ namespace Wobble.IO
             return null;
         }
 
+        public IEnumerable<string> GetAvailableResources()
+        {
+            lock (stores)
+                return stores.SelectMany(store => store.GetAvailableResources()).ToArray();
+        }
+
         protected virtual IEnumerable<string> GetFilenames(string name)
         {
             yield return name;

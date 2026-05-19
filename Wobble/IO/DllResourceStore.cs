@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -49,9 +50,20 @@ namespace Wobble.IO
         {
             var split = name.Split('/');
             for (var i = 0; i < split.Length - 1; i++)
-                split[i] = split[i].Replace('-', '_');
+                split[i] = NormalizeManifestSegment(split[i]);
 
             return assembly?.GetManifestResourceStream($@"{space}.{string.Join(".", split)}");
+        }
+
+        public IEnumerable<string> GetAvailableResources() => assembly.GetManifestResourceNames();
+
+        private static string NormalizeManifestSegment(string segment)
+        {
+            segment = segment.Replace('-', '_');
+
+            return !string.IsNullOrEmpty(segment) && char.IsDigit(segment[0])
+                ? $"_{segment}"
+                : segment;
         }
 
         #region IDisposable Support

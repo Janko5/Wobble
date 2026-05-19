@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -24,5 +25,7 @@ namespace Wobble.IO
         Task<T> GetAsync(string name);
 
         Stream GetStream(string name);
+
+        IEnumerable<string> GetAvailableResources();
     }
 }
