@@ -17,27 +17,56 @@ namespace Wobble.Graphics.Sprites
 
         public Texture2D PerformBlend(Texture2D srcTexture, Texture2D srcMask)
         {
-            if (RenderTarget != null && !RenderTarget.IsDisposed)
+            if (srcTexture == null || srcTexture.IsDisposed || srcMask == null || srcMask.IsDisposed)
+                return srcTexture;
+
+            var previousRenderTarget = RenderTarget;
+            var nextRenderTarget = new RenderTarget2D(GameBase.Game.GraphicsDevice, srcTexture.Width, srcTexture.Height, false,
+                GameBase.Game.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None);
+            var spriteBatchStarted = false;
+            var completed = false;
+
+            RenderTarget = nextRenderTarget;
+
+            try
             {
-                RenderTarget.Dispose();
-                RenderTarget = null;
+                GameBase.Game.GraphicsDevice.SetRenderTarget(RenderTarget);
+
+                // Attempt to end the spritebatch
+                _ = GameBase.Game.TryEndBatch();
+
+                GameBase.Game.SpriteBatch.Begin(blendState: blend);
+                spriteBatchStarted = true;
+
+                GameBase.Game.SpriteBatch.Draw(srcMask, srcTexture.Bounds, Color.White);
+                GameBase.Game.SpriteBatch.Draw(srcTexture, srcTexture.Bounds, Color.White);
+                GameBase.Game.SpriteBatch.End();
+                spriteBatchStarted = false;
+                completed = true;
+            }
+            finally
+            {
+                try
+                {
+                    if (spriteBatchStarted)
+                        _ = GameBase.Game.TryEndBatch();
+                }
+                finally
+                {
+                    GameBase.Game.GraphicsDevice.SetRenderTarget(null);
+
+                    if (!completed)
+                    {
+                        RenderTarget?.Dispose();
+                        RenderTarget = previousRenderTarget;
+                    }
+                }
             }
 
-            RenderTarget = new RenderTarget2D(GameBase.Game.GraphicsDevice, srcTexture.Width, srcTexture.Height, false,
-                GameBase.Game.GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None);
-
-            GameBase.Game.GraphicsDevice.SetRenderTarget(RenderTarget);
-
-            // Attempt to end the spritebatch
-            _ = GameBase.Game.TryEndBatch();
-
-            GameBase.Game.SpriteBatch.Begin(blendState: blend);
-            GameBase.Game.SpriteBatch.Draw(srcMask, srcTexture.Bounds, Color.White);
-            GameBase.Game.SpriteBatch.Draw(srcTexture, srcTexture.Bounds, Color.White);
-            GameBase.Game.SpriteBatch.End();
-
-            GameBase.Game.GraphicsDevice.SetRenderTarget(null);
             GameBase.Game.GraphicsDevice.Clear(Color.Black);
+
+            if (previousRenderTarget != null && !previousRenderTarget.IsDisposed && !ReferenceEquals(previousRenderTarget, srcTexture))
+                previousRenderTarget.Dispose();
 
             return RenderTarget;
         }
