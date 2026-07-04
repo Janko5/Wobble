@@ -169,15 +169,6 @@ namespace Wobble.Graphics.Sprites.Text
             base.Destroy();
         }
 
-        public override void DrawToSpriteBatch()
-        {
-#if DEBUG
-            global::Wobble.Graphics.UI.Debugging.PerformanceStats.RecordSpriteTextPlusDraw(true);
-#endif
-
-            base.DrawToSpriteBatch();
-        }
-
         /// <summary>
         ///     Round the position to align with pixels exactly.
         /// </summary>
@@ -252,6 +243,10 @@ namespace Wobble.Graphics.Sprites.Text
         {
             if (Image == null || Image == WobbleAssets.WhiteBox)
                 return;
+
+#if DEBUG
+            global::Wobble.Graphics.UI.Debugging.PerformanceStats.RecordSpriteTextPlusDraw(true);
+#endif
 
             base.DrawToSpriteBatch();
         }
